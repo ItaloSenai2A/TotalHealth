@@ -42,6 +42,55 @@ namespace TotalHealth.Controllers
             return especialidade;
         }
 
+        // GET: api/Especialidades/nome/{nome}
+        [HttpGet("nome/{nome}")]
+        public async Task<ActionResult<IEnumerable<Especialidade>>> GetEspecialidadesByNome(string nome)
+        {
+            var especialidades = await _context.Especialidades
+                .Where(e => e.Nome.Contains(nome, StringComparison.OrdinalIgnoreCase))
+                .ToListAsync();
+
+            if (especialidades == null || !especialidades.Any())
+            {
+                return NotFound();
+            }
+
+            return especialidades;
+        }
+
+        // GET: api/Especialidades/medico/{medicoId}
+        [HttpGet("medico/{medicoId}")]
+        public async Task<ActionResult<IEnumerable<Especialidade>>> GetEspecialidadesByMedico(Guid medicoId)
+        {
+            var especialidades = await _context.MedicoEspecialidades
+                .Where(me => me.MedicoId == medicoId)
+                .Select(me => me.Especialidade)
+                .ToListAsync();
+
+            if (especialidades == null || !especialidades.Any())
+            {
+                return NotFound();
+            }
+
+            return especialidades;
+        }
+
+        // GET: api/Especialidades/consulta/{consultaId}
+        [HttpGet("consulta/{consultaId}")]
+        public async Task<ActionResult<Especialidade>> GetEspecialidadeByConsulta(Guid consultaId)
+        {
+            var consulta = await _context.Consultas
+                .Include(c => c.Especialidade)
+                .FirstOrDefaultAsync(c => c.ConsultaId == consultaId);
+
+            if (consulta == null)
+            {
+                return NotFound();
+            }
+
+            return consulta.Especialidade;
+        }
+
         // PUT: api/Especialidades/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
@@ -72,6 +121,9 @@ namespace TotalHealth.Controllers
 
             return NoContent();
         }
+
+        // PATCH: api/Especialidades/{id}/nome
+
 
         // POST: api/Especialidades
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
