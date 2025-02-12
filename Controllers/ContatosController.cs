@@ -43,13 +43,12 @@ namespace TotalHealth.Controllers
         }
 
         // PUT: api/Contatos/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutContato(Guid id, Contato contato)
         {
-            if (id != contato.ContatoId)
+            if (id != contato.ContatoId) // Assuming the primary key is 'Id'
             {
-                return BadRequest();
+                return BadRequest("Contato ID mismatch.");
             }
 
             _context.Entry(contato).State = EntityState.Modified;
@@ -74,14 +73,13 @@ namespace TotalHealth.Controllers
         }
 
         // POST: api/Contatos
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Contato>> PostContato(Contato contato)
         {
             _context.Contatos.Add(contato);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetContato", new { id = contato.ContatoId }, contato);
+            return CreatedAtAction(nameof(GetContato), new { id = contato.ContatoId }, contato);
         }
 
         // DELETE: api/Contatos/5
