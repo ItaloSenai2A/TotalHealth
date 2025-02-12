@@ -42,6 +42,55 @@ namespace TotalHealth.Controllers
             return medico;
         }
 
+        // GET: api/Medicos/nome/{nome}
+        [HttpGet("nome/{nome}")]
+        public async Task<ActionResult<IEnumerable<Medico>>> GetMedicosByNome(string nome)
+        {
+            var medicos = await _context.Medicos
+                .Where(m => m.Nome.Contains(nome, StringComparison.OrdinalIgnoreCase))
+                .ToListAsync();
+
+            if (medicos == null || !medicos.Any())
+            {
+                return NotFound();
+            }
+
+            return medicos;
+        }
+
+        // GET: api/Medicos/especialidade/{especialidadeId}
+        [HttpGet("especialidade/{especialidadeId}")]
+        public async Task<ActionResult<IEnumerable<Medico>>> GetMedicosByEspecialidade(Guid especialidadeId)
+        {
+            var medicos = await _context.MedicoEspecialidades
+                .Where(me => me.EspecialidadeId == especialidadeId)
+                .Select(me => me.Medico)
+                .ToListAsync();
+
+            if (medicos == null || !medicos.Any())
+            {
+                return NotFound();
+            }
+
+            return medicos;
+        }
+
+        // GET: api/Medicos/consulta/{consultaId}
+        [HttpGet("consulta/{consultaId}")]
+        public async Task<ActionResult<Medico>> GetMedicoByConsulta(Guid consultaId)
+        {
+            var consulta = await _context.Consultas
+                .Include(c => c.Medico)
+                .FirstOrDefaultAsync(c => c.ConsultaId == consultaId);
+
+            if (consulta == null)
+            {
+                return NotFound();
+            }
+
+            return consulta.Medico;
+        }
+
         // PUT: api/Medicos/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
@@ -72,6 +121,8 @@ namespace TotalHealth.Controllers
 
             return NoContent();
         }
+
+
 
         // POST: api/Medicos
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
