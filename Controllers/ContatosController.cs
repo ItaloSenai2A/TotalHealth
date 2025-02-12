@@ -42,6 +42,41 @@ namespace TotalHealth.Controllers
             return contato;
         }
 
+        // GET: api/Contatos/tipo/{tipo}
+        [HttpGet("tipo/{tipo}")]
+        public async Task<ActionResult<IEnumerable<Contato>>> GetContatosByTipo(string tipo)
+        {
+            var contatos = await _context.Contatos
+                .Where(c => c.Tipo.Equals(tipo, StringComparison.OrdinalIgnoreCase))
+                .ToListAsync();
+
+            if (contatos == null || !contatos.Any())
+            {
+                return NotFound();
+            }
+
+            return contatos;
+        }
+
+        // GET: api/Contatos/valor/{valor}
+
+
+        // GET: api/Contatos/endereco/{endereco}
+        [HttpGet("endereco/{endereco}")]
+        public async Task<ActionResult<IEnumerable<Contato>>> GetContatosByEndereco(string endereco)
+        {
+            var contatos = await _context.Contatos
+                .Where(c => c.Endereco.Equals(endereco, StringComparison.OrdinalIgnoreCase))
+                .ToListAsync();
+
+            if (contatos == null || !contatos.Any())
+            {
+                return NotFound();
+            }
+
+            return contatos;
+        }
+
         // PUT: api/Contatos/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
@@ -72,6 +107,8 @@ namespace TotalHealth.Controllers
 
             return NoContent();
         }
+
+
 
         // POST: api/Contatos
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
