@@ -43,13 +43,12 @@ namespace TotalHealth.Controllers
         }
 
         // PUT: api/Especialidades/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutEspecialidade(Guid id, Especialidade especialidade)
         {
-            if (id != especialidade.EspecialidadeId)
+            if (id != especialidade.EspecialidadeId) // Assuming the primary key is 'Id'
             {
-                return BadRequest();
+                return BadRequest("Especialidade ID mismatch.");
             }
 
             _context.Entry(especialidade).State = EntityState.Modified;
@@ -74,14 +73,13 @@ namespace TotalHealth.Controllers
         }
 
         // POST: api/Especialidades
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Especialidade>> PostEspecialidade(Especialidade especialidade)
         {
             _context.Especialidades.Add(especialidade);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetEspecialidade", new { id = especialidade.EspecialidadeId }, especialidade);
+            return CreatedAtAction(nameof(GetEspecialidade), new { id = especialidade.EspecialidadeId }, especialidade);
         }
 
         // DELETE: api/Especialidades/5
