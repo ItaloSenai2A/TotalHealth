@@ -42,6 +42,38 @@ namespace TotalHealth.Controllers
             return agendamento;
         }
 
+        // GET: api/Agendamentos/date/{date}
+        [HttpGet("date/{date}")]
+        public async Task<ActionResult<IEnumerable<Agendamento>>> GetAgendamentosByDate(DateTime date)
+        {
+            var agendamentos = await _context.Agendamentos
+                .Where(a => a.Data.Date == date.Date)
+                .ToListAsync();
+
+            if (agendamentos == null || !agendamentos.Any())
+            {
+                return NotFound();
+            }
+
+            return agendamentos;
+        }
+
+        // GET: api/Agendamentos/status/{status}
+        [HttpGet("status/{status}")]
+        public async Task<ActionResult<IEnumerable<Agendamento>>> GetAgendamentosByStatus(string status)
+        {
+            var agendamentos = await _context.Agendamentos
+                .Where(a => a.Status.Equals(status, StringComparison.OrdinalIgnoreCase))
+                .ToListAsync();
+
+            if (agendamentos == null || !agendamentos.Any())
+            {
+                return NotFound();
+            }
+
+            return agendamentos;
+        }
+
         // PUT: api/Agendamentos/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutAgendamento(Guid id, Agendamento agendamento)
@@ -51,6 +83,38 @@ namespace TotalHealth.Controllers
                 return BadRequest("Agendamento ID mismatch.");
             }
 
+            _context.Entry(agendamento).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!AgendamentoExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        // PATCH: api/Agendamentos/{id}/status
+        [HttpPatch("{id}/status")]
+        public async Task<IActionResult> UpdateAgendamentoStatus(Guid id, [FromBody] string status)
+        {
+            var agendamento = await _context.Agendamentos.FindAsync(id);
+            if (agendamento == null)
+            {
+                return NotFound();
+            }
+
+            agendamento.Status = status;
             _context.Entry(agendamento).State = EntityState.Modified;
 
             try
