@@ -43,13 +43,12 @@ namespace TotalHealth.Controllers
         }
 
         // PUT: api/Usuarios/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUsuario(Guid id, Usuario usuario)
         {
-            if (id != usuario.UsuarioId)
+            if (id != usuario.UsuarioId) // Assuming the primary key is 'Id'
             {
-                return BadRequest();
+                return BadRequest("User ID mismatch.");
             }
 
             _context.Entry(usuario).State = EntityState.Modified;
@@ -74,14 +73,13 @@ namespace TotalHealth.Controllers
         }
 
         // POST: api/Usuarios
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Usuario>> PostUsuario(Usuario usuario)
         {
             _context.Usuarios.Add(usuario);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetUsuario", new { id = usuario.UsuarioId }, usuario);
+            return CreatedAtAction(nameof(GetUsuario), new { id = usuario.UsuarioId }, usuario);
         }
 
         // DELETE: api/Usuarios/5
