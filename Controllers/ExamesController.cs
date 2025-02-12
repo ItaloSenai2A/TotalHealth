@@ -41,6 +41,54 @@ namespace TotalHealth.Controllers
             return exame;
         }
 
+        // GET: api/Exames/nome/{nome}
+        [HttpGet("nome/{nome}")]
+        public async Task<ActionResult<IEnumerable<Exame>>> GetExamesByNome(string nome)
+        {
+            var exames = await _context.Exames
+                .Where(e => e.Nome.Contains(nome, StringComparison.OrdinalIgnoreCase))
+                .ToListAsync();
+
+            if (exames == null || !exames.Any())
+            {
+                return NotFound();
+            }
+
+            return exames;
+        }
+
+        // GET: api/Exames/usuario/{usuarioId}
+        [HttpGet("usuario/{usuarioId}")]
+        public async Task<ActionResult<IEnumerable<Exame>>> GetExamesByUsuario(Guid usuarioId)
+        {
+            var exames = await _context.Exames
+                .Where(e => e.UsuarioId == usuarioId)
+                .ToListAsync();
+
+            if (exames == null || !exames.Any())
+            {
+                return NotFound();
+            }
+
+            return exames;
+        }
+
+        // GET: api/Exames/prescricao/{prescricaoId}
+        [HttpGet("prescricao/{prescricaoId}")]
+        public async Task<ActionResult<IEnumerable<Exame>>> GetExamesByPrescricao(Guid prescricaoId)
+        {
+            var exames = await _context.Exames
+                .Where(e => e.PrescricaoId == prescricaoId)
+                .ToListAsync();
+
+            if (exames == null || !exames.Any())
+            {
+                return NotFound();
+            }
+
+            return exames;
+        }
+
         // PUT: api/Exames/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
@@ -71,6 +119,7 @@ namespace TotalHealth.Controllers
 
             return NoContent();
         }
+
 
         // POST: api/Exames
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
