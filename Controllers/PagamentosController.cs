@@ -41,6 +41,55 @@ namespace TotalHealth.Controllers
             return pagamento;
         }
 
+        // GET: api/Pagamentos/consulta/{consultaId}
+        [HttpGet("consulta/{consultaId}")]
+        public async Task<ActionResult<IEnumerable<Pagamento>>> GetPagamentosByConsulta(Guid consultaId)
+        {
+            var pagamentos = await _context.Pagamentos
+                .Where(p => p.ConsultaId == consultaId)
+                .ToListAsync();
+
+            if (pagamentos == null || !pagamentos.Any())
+            {
+                return NotFound();
+            }
+
+            return pagamentos;
+        }
+
+        // GET: api/Pagamentos/usuario/{usuarioId}
+        [HttpGet("usuario/{usuarioId}")]
+        public async Task<ActionResult<IEnumerable<Pagamento>>> GetPagamentosByUsuario(Guid usuarioId)
+        {
+            var pagamentos = await _context.Pagamentos
+                .Include(p => p.Consulta)
+                .Where(p => p.Consulta.UsuarioId == usuarioId)
+                .ToListAsync();
+
+            if (pagamentos == null || !pagamentos.Any())
+            {
+                return NotFound();
+            }
+
+            return pagamentos;
+        }
+
+        // GET: api/Pagamentos/exame/{exameId}
+        [HttpGet("exame/{exameId}")]
+        public async Task<ActionResult<IEnumerable<Pagamento>>> GetPagamentosByExame(Guid exameId)
+        {
+            var pagamentos = await _context.Pagamentos
+                .Where(p => p.ExameId == exameId)
+                .ToListAsync();
+
+            if (pagamentos == null || !pagamentos.Any())
+            {
+                return NotFound();
+            }
+
+            return pagamentos;
+        }
+
         // PUT: api/Pagamentos/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
@@ -51,6 +100,38 @@ namespace TotalHealth.Controllers
                 return BadRequest();
             }
 
+            _context.Entry(pagamento).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!PagamentoExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        // PATCH: api/Pagamentos/{id}/valor
+        [HttpPatch("{id}/valor")]
+        public async Task<IActionResult> UpdatePagamentoValor(Guid id, [FromBody] decimal valor)
+        {
+            var pagamento = await _context.Pagamentos.FindAsync(id);
+            if (pagamento == null)
+            {
+                return NotFound();
+            }
+
+            pagamento.Valor = valor;
             _context.Entry(pagamento).State = EntityState.Modified;
 
             try
