@@ -43,13 +43,12 @@ namespace TotalHealth.Controllers
         }
 
         // PUT: api/Agendamentos/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutAgendamento(Guid id, Agendamento agendamento)
         {
-            if (id != agendamento.AgendamentoId)
+            if (id != agendamento.AgendamentoId) // Assuming the primary key is 'Id'
             {
-                return BadRequest();
+                return BadRequest("Agendamento ID mismatch.");
             }
 
             _context.Entry(agendamento).State = EntityState.Modified;
@@ -74,14 +73,13 @@ namespace TotalHealth.Controllers
         }
 
         // POST: api/Agendamentos
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Agendamento>> PostAgendamento(Agendamento agendamento)
         {
             _context.Agendamentos.Add(agendamento);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetAgendamento", new { id = agendamento.AgendamentoId }, agendamento);
+            return CreatedAtAction(nameof(GetAgendamento), new { id = agendamento.AgendamentoId }, agendamento);
         }
 
         // DELETE: api/Agendamentos/5
