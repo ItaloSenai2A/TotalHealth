@@ -41,6 +41,57 @@ namespace TotalHealth.Controllers
             return medicoEspecialidade;
         }
 
+        // GET: api/MedicosEspecialidades/medico/{medicoId}
+        [HttpGet("medico/{medicoId}")]
+        public async Task<ActionResult<IEnumerable<Especialidade>>> GetEspecialidadesByMedico(Guid medicoId)
+        {
+            var especialidades = await _context.MedicoEspecialidades
+                .Where(me => me.MedicoId == medicoId)
+                .Select(me => me.Especialidade)
+                .ToListAsync();
+
+            if (especialidades == null || !especialidades.Any())
+            {
+                return NotFound();
+            }
+
+            return especialidades;
+        }
+
+        // GET: api/MedicosEspecialidades/especialidade/{especialidadeId}
+        [HttpGet("especialidade/{especialidadeId}")]
+        public async Task<ActionResult<IEnumerable<Medico>>> GetMedicosByEspecialidade(Guid especialidadeId)
+        {
+            var medicos = await _context.MedicoEspecialidades
+                .Where(me => me.EspecialidadeId == especialidadeId)
+                .Select(me => me.Medico)
+                .ToListAsync();
+
+            if (medicos == null || !medicos.Any())
+            {
+                return NotFound();
+            }
+
+            return medicos;
+        }
+
+        // GET: api/MedicosEspecialidades/medico/nome/{nome}
+        [HttpGet("medico/nome/{nome}")]
+        public async Task<ActionResult<IEnumerable<Especialidade>>> GetEspecialidadesByNomeMedico(string nome)
+        {
+            var especialidades = await _context.MedicoEspecialidades
+                .Where(me => me.Medico.Nome.Contains(nome, StringComparison.OrdinalIgnoreCase))
+                .Select(me => me.Especialidade)
+                .ToListAsync();
+
+            if (especialidades == null || !especialidades.Any())
+            {
+                return NotFound();
+            }
+
+            return especialidades;
+        }
+
         // PUT: api/MedicosEspecialidades/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
@@ -51,6 +102,38 @@ namespace TotalHealth.Controllers
                 return BadRequest();
             }
 
+            _context.Entry(medicoEspecialidade).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!MedicoEspecialidadeExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        // PATCH: api/MedicosEspecialidades/{id}/especialidade
+        [HttpPatch("{id}/especialidade")]
+        public async Task<IActionResult> UpdateEspecialidadeMedico(Guid id, [FromBody] Guid especialidadeId)
+        {
+            var medicoEspecialidade = await _context.MedicoEspecialidades.FindAsync(id);
+            if (medicoEspecialidade == null)
+            {
+                return NotFound();
+            }
+
+            medicoEspecialidade.EspecialidadeId = especialidadeId;
             _context.Entry(medicoEspecialidade).State = EntityState.Modified;
 
             try
