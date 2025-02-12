@@ -34,6 +34,8 @@ namespace TotalHealth.Data
             modelBuilder.Entity<Pagamento>().ToTable("Pagamentos");
             modelBuilder.Entity<Prescricao>().ToTable("Prescricoes");
             modelBuilder.Entity<Usuario>().ToTable("Usuarios");
+            modelBuilder.Entity<MedicoEspecialidade>().ToTable("MedicosEspecialidades");
+
 
         }
     }
