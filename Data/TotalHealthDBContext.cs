@@ -19,6 +19,8 @@ namespace TotalHealth.Data
         public DbSet<Pagamento> Pagamentos { get; set; }
         public DbSet<Prescricao> Prescricoes { get; set; }
         public DbSet<Usuario> Usuarios { get; set; }
+        public DbSet<MedicoEspecialidade> MedicoEspecialidades { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
