@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TotalHealth.Data;
+using TotalHealth.Models; // Certifique-se de incluir o namespace correto para o modelo Pagamento
 
 namespace TotalHealth.Controllers
 {
@@ -91,13 +92,12 @@ namespace TotalHealth.Controllers
         }
 
         // PUT: api/Pagamentos/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutPagamento(Guid id, Pagamento pagamento)
         {
-            if (id != pagamento.PagamentoId)
+            if (id != pagamento.PagamentoId) // Assuming the primary key is 'Id'
             {
-                return BadRequest();
+                return BadRequest("Pagamento ID mismatch.");
             }
 
             _context.Entry(pagamento).State = EntityState.Modified;
@@ -154,14 +154,13 @@ namespace TotalHealth.Controllers
         }
 
         // POST: api/Pagamentos
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Pagamento>> PostPagamento(Pagamento pagamento)
         {
             _context.Pagamentos.Add(pagamento);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetPagamento", new { id = pagamento.PagamentoId }, pagamento);
+            return CreatedAtAction(nameof(GetPagamento), new { id = pagamento.PagamentoId }, pagamento);
         }
 
         // DELETE: api/Pagamentos/5

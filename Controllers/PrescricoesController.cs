@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TotalHealth.Data;
+using TotalHealth.Models; // Certifique-se de incluir o namespace correto para o modelo Prescricao
 
 namespace TotalHealth.Controllers
 {
@@ -92,13 +93,12 @@ namespace TotalHealth.Controllers
         }
 
         // PUT: api/Prescricoes/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutPrescricao(Guid id, Prescricao prescricao)
         {
-            if (id != prescricao.PrescricaoId)
+            if (id != prescricao.PrescricaoId) // Assuming the primary key is 'Id'
             {
-                return BadRequest();
+                return BadRequest("Prescricao ID mismatch.");
             }
 
             _context.Entry(prescricao).State = EntityState.Modified;
@@ -155,14 +155,13 @@ namespace TotalHealth.Controllers
         }
 
         // POST: api/Prescricoes
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Prescricao>> PostPrescricao(Prescricao prescricao)
         {
             _context.Prescricoes.Add(prescricao);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetPrescricao", new { id = prescricao.PrescricaoId }, prescricao);
+            return CreatedAtAction(nameof(GetPrescricao), new { id = prescricao.PrescricaoId }, prescricao);
         }
 
         // DELETE: api/Prescricoes/5

@@ -92,13 +92,12 @@ namespace TotalHealth.Controllers
         }
 
         // PUT: api/Medicos/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutMedico(Guid id, Medico medico)
         {
-            if (id != medico.MedicoId)
+            if (id != medico.MedicoId) // Assuming the primary key is 'Id'
             {
-                return BadRequest();
+                return BadRequest("Medico ID mismatch.");
             }
 
             _context.Entry(medico).State = EntityState.Modified;
@@ -125,14 +124,13 @@ namespace TotalHealth.Controllers
 
 
         // POST: api/Medicos
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Medico>> PostMedico(Medico medico)
         {
             _context.Medicos.Add(medico);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetMedico", new { id = medico.MedicoId }, medico);
+            return CreatedAtAction(nameof(GetMedico), new { id = medico.MedicoId }, medico);
         }
 
         // DELETE: api/Medicos/5

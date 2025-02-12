@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TotalHealth.Data;
+using TotalHealth.Models; // Certifique-se de incluir o namespace correto para o modelo Exame
 
 namespace TotalHealth.Controllers
 {
@@ -90,13 +91,12 @@ namespace TotalHealth.Controllers
         }
 
         // PUT: api/Exames/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutExame(Guid id, Exame exame)
         {
-            if (id != exame.ExameId)
+            if (id != exame.ExameId) // Assuming the primary key is 'Id'
             {
-                return BadRequest();
+                return BadRequest("Exame ID mismatch.");
             }
 
             _context.Entry(exame).State = EntityState.Modified;
@@ -122,14 +122,13 @@ namespace TotalHealth.Controllers
 
 
         // POST: api/Exames
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Exame>> PostExame(Exame exame)
         {
             _context.Exames.Add(exame);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetExame", new { id = exame.ExameId }, exame);
+            return CreatedAtAction(nameof(GetExame), new { id = exame.ExameId }, exame);
         }
 
         // DELETE: api/Exames/5
