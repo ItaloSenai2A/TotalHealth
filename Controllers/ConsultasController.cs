@@ -43,13 +43,12 @@ namespace TotalHealth.Controllers
         }
 
         // PUT: api/Consultas/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutConsulta(Guid id, Consulta consulta)
         {
-            if (id != consulta.ConsultaId)
+            if (id != consulta.ConsultaId) // Assuming the primary key is 'Id'
             {
-                return BadRequest();
+                return BadRequest("Consulta ID mismatch.");
             }
 
             _context.Entry(consulta).State = EntityState.Modified;
@@ -74,14 +73,13 @@ namespace TotalHealth.Controllers
         }
 
         // POST: api/Consultas
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Consulta>> PostConsulta(Consulta consulta)
         {
             _context.Consultas.Add(consulta);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetConsulta", new { id = consulta.ConsultaId }, consulta);
+            return CreatedAtAction(nameof(GetConsulta), new { id = consulta.ConsultaId }, consulta);
         }
 
         // DELETE: api/Consultas/5
