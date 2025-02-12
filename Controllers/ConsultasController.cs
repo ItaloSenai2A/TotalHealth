@@ -42,6 +42,54 @@ namespace TotalHealth.Controllers
             return consulta;
         }
 
+        // GET: api/Consultas/date/{date}
+        [HttpGet("date/{date}")]
+        public async Task<ActionResult<IEnumerable<Consulta>>> GetConsultasByDate(DateTime date)
+        {
+            var consultas = await _context.Consultas
+                .Where(c => c.DataHora.Date == date.Date)
+                .ToListAsync();
+
+            if (consultas == null || !consultas.Any())
+            {
+                return NotFound();
+            }
+
+            return consultas;
+        }
+
+        // GET: api/Consultas/status/{status}
+        [HttpGet("status/{status}")]
+        public async Task<ActionResult<IEnumerable<Consulta>>> GetConsultasByStatus(string status)
+        {
+            var consultas = await _context.Consultas
+                .Where(c => c.Status.Equals(status, StringComparison.OrdinalIgnoreCase))
+                .ToListAsync();
+
+            if (consultas == null || !consultas.Any())
+            {
+                return NotFound();
+            }
+
+            return consultas;
+        }
+
+        // GET: api/Consultas/usuario/{usuarioId}
+        [HttpGet("usuario/{usuarioId}")]
+        public async Task<ActionResult<IEnumerable<Consulta>>> GetConsultasByUsuario(Guid usuarioId)
+        {
+            var consultas = await _context.Consultas
+                .Where(c => c.UsuarioId == usuarioId)
+                .ToListAsync();
+
+            if (consultas == null || !consultas.Any())
+            {
+                return NotFound();
+            }
+
+            return consultas;
+        }
+
         // PUT: api/Consultas/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
@@ -52,6 +100,38 @@ namespace TotalHealth.Controllers
                 return BadRequest();
             }
 
+            _context.Entry(consulta).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!ConsultaExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        // PATCH: api/Consultas/{id}/status
+        [HttpPatch("{id}/status")]
+        public async Task<IActionResult> UpdateConsultaStatus(Guid id, [FromBody] string status)
+        {
+            var consulta = await _context.Consultas.FindAsync(id);
+            if (consulta == null)
+            {
+                return NotFound();
+            }
+
+            consulta.Status = status;
             _context.Entry(consulta).State = EntityState.Modified;
 
             try
