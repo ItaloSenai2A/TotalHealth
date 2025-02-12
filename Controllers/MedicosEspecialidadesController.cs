@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TotalHealth.Data;
+using TotalHealth.Models; // Certifique-se de incluir o namespace correto para o modelo MedicoEspecialidade
 
 namespace TotalHealth.Controllers
 {
@@ -42,13 +43,12 @@ namespace TotalHealth.Controllers
         }
 
         // PUT: api/MedicosEspecialidades/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutMedicoEspecialidade(Guid id, MedicoEspecialidade medicoEspecialidade)
         {
-            if (id != medicoEspecialidade.MedicoEspecialidadeId)
+            if (id != medicoEspecialidade.MedicoEspecialidadeId) // Assuming the primary key is 'Id'
             {
-                return BadRequest();
+                return BadRequest("MedicoEspecialidade ID mismatch.");
             }
 
             _context.Entry(medicoEspecialidade).State = EntityState.Modified;
@@ -73,14 +73,13 @@ namespace TotalHealth.Controllers
         }
 
         // POST: api/MedicosEspecialidades
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<MedicoEspecialidade>> PostMedicoEspecialidade(MedicoEspecialidade medicoEspecialidade)
         {
             _context.MedicoEspecialidades.Add(medicoEspecialidade);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetMedicoEspecialidade", new { id = medicoEspecialidade.MedicoEspecialidadeId }, medicoEspecialidade);
+            return CreatedAtAction(nameof(GetMedicoEspecialidade), new { id = medicoEspecialidade.MedicoEspecialidadeId }, medicoEspecialidade);
         }
 
         // DELETE: api/MedicosEspecialidades/5
