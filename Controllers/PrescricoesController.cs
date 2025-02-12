@@ -41,6 +41,56 @@ namespace TotalHealth.Controllers
             return prescricao;
         }
 
+        // GET: api/Prescricoes/consulta/{consultaId}
+        [HttpGet("consulta/{consultaId}")]
+        public async Task<ActionResult<IEnumerable<Prescricao>>> GetPrescricoesByConsulta(Guid consultaId)
+        {
+            var prescricoes = await _context.Prescricoes
+                .Where(p => p.ConsultaId == consultaId)
+                .ToListAsync();
+
+            if (prescricoes == null || !prescricoes.Any())
+            {
+                return NotFound();
+            }
+
+            return prescricoes;
+        }
+
+        // GET: api/Prescricoes/usuario/{usuarioId}
+        [HttpGet("usuario/{usuarioId}")]
+        public async Task<ActionResult<IEnumerable<Prescricao>>> GetPrescricoesByUsuario(Guid usuarioId)
+        {
+            var prescricoes = await _context.Prescricoes
+                .Include(p => p.Consulta)
+                .Where(p => p.Consulta.UsuarioId == usuarioId)
+                .ToListAsync();
+
+            if (prescricoes == null || !prescricoes.Any())
+            {
+                return NotFound();
+            }
+
+            return prescricoes;
+        }
+
+        // GET: api/Prescricoes/medico/{medicoId}
+        [HttpGet("medico/{medicoId}")]
+        public async Task<ActionResult<IEnumerable<Prescricao>>> GetPrescricoesByMedico(Guid medicoId)
+        {
+            var prescricoes = await _context.Prescricoes
+                .Include(p => p.Consulta)
+                .Where(p => p.Consulta.MedicoId == medicoId)
+                .ToListAsync();
+
+            if (prescricoes == null || !prescricoes.Any())
+            {
+                return NotFound();
+            }
+
+            return prescricoes;
+        }
+
         // PUT: api/Prescricoes/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
@@ -51,6 +101,38 @@ namespace TotalHealth.Controllers
                 return BadRequest();
             }
 
+            _context.Entry(prescricao).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!PrescricaoExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        // PATCH: api/Prescricoes/{id}/descricao
+        [HttpPatch("{id}/descricao")]
+        public async Task<IActionResult> UpdatePrescricaoDescricao(Guid id, [FromBody] string descricao)
+        {
+            var prescricao = await _context.Prescricoes.FindAsync(id);
+            if (prescricao == null)
+            {
+                return NotFound();
+            }
+
+            prescricao.Descricao = descricao;
             _context.Entry(prescricao).State = EntityState.Modified;
 
             try
