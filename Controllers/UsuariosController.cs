@@ -102,5 +102,73 @@ namespace TotalHealth.Controllers
         {
             return _context.Usuarios.Any(e => e.UsuarioId == id);
         }
+        // Autenticação de Usuário
+
+
+        // Filtragem e Pesquisa de Usuários
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<Usuario>>> SearchUsuarios(string nome, string email, string cpf)
+        {
+            var query = _context.Usuarios.AsQueryable();
+
+            if (!string.IsNullOrEmpty(nome))
+            {
+                query = query.Where(u => u.Nome.Contains(nome));
+            }
+
+            if (!string.IsNullOrEmpty(email))
+            {
+                query = query.Where(u => u.Email.Contains(email));
+            }
+
+            if (!string.IsNullOrEmpty(cpf))
+            {
+                query = query.Where(u => u.Cpf.Contains(cpf));
+            }
+
+            return await query.ToListAsync();
+        }
+
+        [HttpGet("paged")]
+        public async Task<ActionResult<IEnumerable<Usuario>>> GetUsuariosPaged(int pageNumber = 1, int pageSize = 10)
+        {
+            var usuarios = await _context.Usuarios
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return Ok(usuarios);
+        }
+
+        // Recuperação de Dados Relacionados
+        [HttpGet("{id}/consultas")]
+        public async Task<ActionResult<IEnumerable<Consulta>>> GetConsultasByUsuario(Guid id)
+        {
+            var consultas = await _context.Consultas
+                .Where(c => c.UsuarioId == id)
+                .ToListAsync();
+
+            if (consultas == null || !consultas.Any())
+            {
+                return NotFound();
+            }
+
+            return Ok(consultas);
+        }
+
+        [HttpGet("{id}/exames")]
+        public async Task<ActionResult<IEnumerable<Exame>>> GetExamesByUsuario(Guid id)
+        {
+            var exames = await _context.Exames
+                .Where(e => e.UsuarioId == id)
+                .ToListAsync();
+
+            if (exames == null || !exames.Any())
+            {
+                return NotFound();
+            }
+
+            return Ok(exames);
+        }
     }
 }
