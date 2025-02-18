@@ -13,6 +13,5 @@ public class Usuario
     public string Genero { get; set; }
     public string TipoSanguineo { get; set; }
     public string Endereco { get; set; }
-    public ICollection<Exame> Exames { get; set; }
-    public ICollection<Consulta> Consultas { get; set; }
+
 }

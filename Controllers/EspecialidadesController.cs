@@ -75,21 +75,6 @@ namespace TotalHealth.Controllers
             return especialidades;
         }
 
-        // GET: api/Especialidades/consulta/{consultaId}
-        [HttpGet("consulta/{consultaId}")]
-        public async Task<ActionResult<Especialidade>> GetEspecialidadeByConsulta(Guid consultaId)
-        {
-            var consulta = await _context.Consultas
-                .Include(c => c.Especialidade)
-                .FirstOrDefaultAsync(c => c.ConsultaId == consultaId);
-
-            if (consulta == null)
-            {
-                return NotFound();
-            }
-
-            return consulta.Especialidade;
-        }
 
         // PUT: api/Especialidades/5
         [HttpPut("{id}")]

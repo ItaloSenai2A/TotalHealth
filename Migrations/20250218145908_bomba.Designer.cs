@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TotalHealth.Data;
 
@@ -11,9 +12,11 @@ using TotalHealth.Data;
 namespace TotalHealth.Migrations
 {
     [DbContext(typeof(TotalHealthDBContext))]
-    partial class TotalHealthDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250218145908_bomba")]
+    partial class bomba
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -365,6 +368,9 @@ namespace TotalHealth.Migrations
                     b.Property<DateTime>("DataHora")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid>("EspecialidadeId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("MedicoId")
                         .HasColumnType("uniqueidentifier");
 
@@ -379,6 +385,8 @@ namespace TotalHealth.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("ConsultaId");
+
+                    b.HasIndex("EspecialidadeId");
 
                     b.HasIndex("MedicoId");
 
@@ -639,6 +647,12 @@ namespace TotalHealth.Migrations
 
             modelBuilder.Entity("TotalHealth.Models.Consulta", b =>
                 {
+                    b.HasOne("TotalHealth.Models.Especialidade", "Especialidade")
+                        .WithMany()
+                        .HasForeignKey("EspecialidadeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("TotalHealth.Models.Medico", "Medico")
                         .WithMany()
                         .HasForeignKey("MedicoId")
@@ -650,6 +664,8 @@ namespace TotalHealth.Migrations
                         .HasForeignKey("UsuarioId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Especialidade");
 
                     b.Navigation("Medico");
 
