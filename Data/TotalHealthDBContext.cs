@@ -30,11 +30,11 @@ namespace TotalHealth.Data
             modelBuilder.Entity<Contato>().ToTable("Contatos");
             modelBuilder.Entity<Especialidade>().ToTable("Especialidades");
             modelBuilder.Entity<Exame>().ToTable("Exames");
-            modelBuilder.Entity<Medico>().ToTable("Médicos");
+            modelBuilder.Entity<Medico>().ToTable("Medicos");
             modelBuilder.Entity<Pagamento>().ToTable("Pagamentos");
-            modelBuilder.Entity<Prescricao>().ToTable("Prescrições");
-            modelBuilder.Entity<Usuario>().ToTable("Usuários");
-            modelBuilder.Entity<MedicoEspecialidade>().ToTable("MédicosEspecialidades");
+            modelBuilder.Entity<Prescricao>().ToTable("Prescricoes");
+            modelBuilder.Entity<Usuario>().ToTable("Usuarios");
+            modelBuilder.Entity<MedicoEspecialidade>().ToTable("MedicosEspecialidades");
 
 
         }
