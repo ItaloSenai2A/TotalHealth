@@ -12,8 +12,8 @@ using TotalHealth.Data;
 namespace TotalHealth.Migrations
 {
     [DbContext(typeof(TotalHealthDBContext))]
-    [Migration("20250212172547_NovaClassInserida")]
-    partial class NovaClassInserida
+    [Migration("20250218190813_Iniico")]
+    partial class Iniico
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -294,7 +294,7 @@ namespace TotalHealth.Migrations
                     b.Property<decimal>("Valor")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<decimal>("ValorExame")
+                    b.Property<decimal?>("ValorExame")
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("PagamentoId");
@@ -335,7 +335,7 @@ namespace TotalHealth.Migrations
                     b.Property<Guid>("ConsultaId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("DataHora")
+                    b.Property<DateTime>("Data")
                         .HasColumnType("datetime2");
 
                     b.Property<Guid>("EspecialidadeId")
@@ -343,6 +343,10 @@ namespace TotalHealth.Migrations
 
                     b.Property<Guid>("MedicoId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("AgendamentoId");
 
@@ -364,9 +368,6 @@ namespace TotalHealth.Migrations
                     b.Property<DateTime>("DataHora")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("EspecialidadeId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("MedicoId")
                         .HasColumnType("uniqueidentifier");
 
@@ -381,8 +382,6 @@ namespace TotalHealth.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("ConsultaId");
-
-                    b.HasIndex("EspecialidadeId");
 
                     b.HasIndex("MedicoId");
 
@@ -498,13 +497,13 @@ namespace TotalHealth.Migrations
             modelBuilder.Entity("Exame", b =>
                 {
                     b.HasOne("Prescricao", "Prescricao")
-                        .WithMany("Exames")
+                        .WithMany()
                         .HasForeignKey("PrescricaoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Usuario", "Usuario")
-                        .WithMany("Exames")
+                        .WithMany()
                         .HasForeignKey("UsuarioId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -517,13 +516,13 @@ namespace TotalHealth.Migrations
             modelBuilder.Entity("MedicoEspecialidade", b =>
                 {
                     b.HasOne("TotalHealth.Models.Especialidade", "Especialidade")
-                        .WithMany("MedicoEspecialidades")
+                        .WithMany()
                         .HasForeignKey("EspecialidadeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("TotalHealth.Models.Medico", "Medico")
-                        .WithMany("MedicoEspecialidades")
+                        .WithMany()
                         .HasForeignKey("MedicoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -587,13 +586,13 @@ namespace TotalHealth.Migrations
             modelBuilder.Entity("Pagamento", b =>
                 {
                     b.HasOne("TotalHealth.Models.Consulta", "Consulta")
-                        .WithMany("Pagamentos")
+                        .WithMany()
                         .HasForeignKey("ConsultaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Exame", "Exame")
-                        .WithMany("Pagamentos")
+                        .WithMany()
                         .HasForeignKey("ExameId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -606,7 +605,7 @@ namespace TotalHealth.Migrations
             modelBuilder.Entity("Prescricao", b =>
                 {
                     b.HasOne("TotalHealth.Models.Consulta", "Consulta")
-                        .WithMany("Prescricoes")
+                        .WithMany()
                         .HasForeignKey("ConsultaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -623,13 +622,13 @@ namespace TotalHealth.Migrations
                         .IsRequired();
 
                     b.HasOne("TotalHealth.Models.Especialidade", "Especialidade")
-                        .WithMany("Agendamentos")
+                        .WithMany()
                         .HasForeignKey("EspecialidadeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("TotalHealth.Models.Medico", "Medico")
-                        .WithMany("Agendamentos")
+                        .WithMany()
                         .HasForeignKey("MedicoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -643,71 +642,21 @@ namespace TotalHealth.Migrations
 
             modelBuilder.Entity("TotalHealth.Models.Consulta", b =>
                 {
-                    b.HasOne("TotalHealth.Models.Especialidade", "Especialidade")
-                        .WithMany("Consultas")
-                        .HasForeignKey("EspecialidadeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("TotalHealth.Models.Medico", "Medico")
-                        .WithMany("Consultas")
+                        .WithMany()
                         .HasForeignKey("MedicoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Usuario", "Usuario")
-                        .WithMany("Consultas")
+                        .WithMany()
                         .HasForeignKey("UsuarioId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Especialidade");
-
                     b.Navigation("Medico");
 
                     b.Navigation("Usuario");
-                });
-
-            modelBuilder.Entity("Exame", b =>
-                {
-                    b.Navigation("Pagamentos");
-                });
-
-            modelBuilder.Entity("Prescricao", b =>
-                {
-                    b.Navigation("Exames");
-                });
-
-            modelBuilder.Entity("TotalHealth.Models.Consulta", b =>
-                {
-                    b.Navigation("Pagamentos");
-
-                    b.Navigation("Prescricoes");
-                });
-
-            modelBuilder.Entity("TotalHealth.Models.Especialidade", b =>
-                {
-                    b.Navigation("Agendamentos");
-
-                    b.Navigation("Consultas");
-
-                    b.Navigation("MedicoEspecialidades");
-                });
-
-            modelBuilder.Entity("TotalHealth.Models.Medico", b =>
-                {
-                    b.Navigation("Agendamentos");
-
-                    b.Navigation("Consultas");
-
-                    b.Navigation("MedicoEspecialidades");
-                });
-
-            modelBuilder.Entity("Usuario", b =>
-                {
-                    b.Navigation("Consultas");
-
-                    b.Navigation("Exames");
                 });
 #pragma warning restore 612, 618
         }
