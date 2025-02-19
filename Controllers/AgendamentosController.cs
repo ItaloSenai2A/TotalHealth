@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,7 @@ namespace TotalHealth.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class AgendamentosController : ControllerBase
     {
         private readonly TotalHealthDBContext _context;
@@ -23,6 +25,7 @@ namespace TotalHealth.Controllers
 
         // GET: api/Agendamentos
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<Agendamento>>> GetAgendamentos()
         {
             return await _context.Agendamentos.ToListAsync();

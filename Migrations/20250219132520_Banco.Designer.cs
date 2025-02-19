@@ -12,8 +12,8 @@ using TotalHealth.Data;
 namespace TotalHealth.Migrations
 {
     [DbContext(typeof(TotalHealthDBContext))]
-    [Migration("20250219114156_Initial")]
-    partial class Initial
+    [Migration("20250219132520_Banco")]
+    partial class Banco
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -372,7 +372,6 @@ namespace TotalHealth.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Status")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("UsuarioId")

@@ -10,7 +10,7 @@ namespace TotalHealth.Models
         public Guid MedicoId { get; set; }
         public Medico? Medico { get; set; }
         public DateTime DataHora { get; set; }
-        public string Status { get; set; }
+        public string? Status { get; set; }
         [Column(TypeName = "decimal(18,2)")]
         public decimal Valor { get; set; }
     }

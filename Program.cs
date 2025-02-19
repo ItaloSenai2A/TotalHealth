@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Configurar a conexão com o banco de dados
 builder.Services.AddDbContext<TotalHealthDBContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("Somee"));
 });
 
 // Add services to the container.

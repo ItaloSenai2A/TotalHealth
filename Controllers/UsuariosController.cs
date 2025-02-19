@@ -9,11 +9,13 @@ using Microsoft.AspNetCore.Identity;
 using TotalHealth.Data;
 using TotalHealth.Models;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TotalHealth.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class UsuariosController : ControllerBase
     {
         private readonly TotalHealthDBContext _context;
@@ -27,6 +29,7 @@ namespace TotalHealth.Controllers
 
         // GET: api/Usuarios
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<Usuario>>> GetUsuarios()
         {
             return await _context.Usuarios.ToListAsync();

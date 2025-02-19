@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace TotalHealth.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class Banco : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -255,7 +255,7 @@ namespace TotalHealth.Migrations
                     UsuarioId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     MedicoId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     DataHora = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Valor = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
                 },
                 constraints: table =>
