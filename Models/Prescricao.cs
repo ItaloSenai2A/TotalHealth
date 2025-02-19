@@ -6,5 +6,4 @@ public class Prescricao
     public Guid ConsultaId { get; set; }
     public Consulta? Consulta { get; set; }
     public string Descricao { get; set; }
-
 }

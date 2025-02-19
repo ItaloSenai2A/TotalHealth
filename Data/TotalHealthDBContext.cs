@@ -21,10 +21,10 @@ namespace TotalHealth.Data
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<MedicoEspecialidade> MedicoEspecialidades { get; set; }
 
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
             modelBuilder.Entity<Agendamento>().ToTable("Agendamentos");
             modelBuilder.Entity<Consulta>().ToTable("Consultas");
             modelBuilder.Entity<Contato>().ToTable("Contatos");
@@ -36,7 +36,78 @@ namespace TotalHealth.Data
             modelBuilder.Entity<Usuario>().ToTable("Usuarios");
             modelBuilder.Entity<MedicoEspecialidade>().ToTable("MedicosEspecialidades");
 
+            // Configurar comportamento de exclusão para evitar múltiplos caminhos de exclusão em cascata
+            modelBuilder.Entity<Agendamento>()
+                .HasOne(a => a.Medico)
+                .WithMany()
+                .HasForeignKey(a => a.MedicoId)
+                .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<Agendamento>()
+                .HasOne(a => a.Consulta)
+                .WithMany()
+                .HasForeignKey(a => a.ConsultaId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Agendamento>()
+                .HasOne(a => a.Especialidade)
+                .WithMany()
+                .HasForeignKey(a => a.EspecialidadeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Consulta>()
+                .HasOne(c => c.Medico)
+                .WithMany()
+                .HasForeignKey(c => c.MedicoId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Consulta>()
+                .HasOne(c => c.Usuario)
+                .WithMany()
+                .HasForeignKey(c => c.UsuarioId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Exame>()
+                .HasOne(e => e.Usuario)
+                .WithMany()
+                .HasForeignKey(e => e.UsuarioId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Exame>()
+                .HasOne(e => e.Prescricao)
+                .WithMany()
+                .HasForeignKey(e => e.PrescricaoId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Pagamento>()
+                .HasOne(p => p.Consulta)
+                .WithMany()
+                .HasForeignKey(p => p.ConsultaId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Pagamento>()
+                .HasOne(p => p.Exame)
+                .WithMany()
+                .HasForeignKey(p => p.ExameId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Prescricao>()
+                .HasOne(p => p.Consulta)
+                .WithMany()
+                .HasForeignKey(p => p.ConsultaId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<MedicoEspecialidade>()
+                .HasOne(me => me.Medico)
+                .WithMany()
+                .HasForeignKey(me => me.MedicoId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<MedicoEspecialidade>()
+                .HasOne(me => me.Especialidade)
+                .WithMany()
+                .HasForeignKey(me => me.EspecialidadeId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

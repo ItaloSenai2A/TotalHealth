@@ -1,4 +1,6 @@
-﻿namespace TotalHealth.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace TotalHealth.Models
 {
     public class Consulta
     {
@@ -9,6 +11,7 @@
         public Medico? Medico { get; set; }
         public DateTime DataHora { get; set; }
         public string Status { get; set; }
+        [Column(TypeName = "decimal(18,2)")]
         public decimal Valor { get; set; }
     }
 }
