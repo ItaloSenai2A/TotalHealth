@@ -10,6 +10,9 @@ using TotalHealth.Data;
 using TotalHealth.Models;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
 
 namespace TotalHealth.Controllers
 {
@@ -20,11 +23,13 @@ namespace TotalHealth.Controllers
     {
         private readonly TotalHealthDBContext _context;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly IConfiguration _configuration;
 
-        public UsuariosController(TotalHealthDBContext context, UserManager<IdentityUser> userManager)
+        public UsuariosController(TotalHealthDBContext context, UserManager<IdentityUser> userManager, IConfiguration configuration)
         {
             _context = context;
             _userManager = userManager;
+            _configuration = configuration;
         }
 
         // GET: api/Usuarios
@@ -50,7 +55,6 @@ namespace TotalHealth.Controllers
         }
 
         // PUT: api/Usuarios/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUsuario(Guid id, Usuario usuario)
         {
@@ -81,11 +85,9 @@ namespace TotalHealth.Controllers
         }
 
         // POST: api/Usuarios
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Usuario>> PostUsuario(Usuario usuario)
         {
-            // Obter o ID do usuário de forma mais segura
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (string.IsNullOrEmpty(userId))
@@ -155,20 +157,112 @@ namespace TotalHealth.Controllers
             return Ok(usuario);
         }
 
+        // POST: api/Usuarios/registrar
+        [AllowAnonymous]
+        [HttpPost("registrar")]
+        public async Task<IActionResult> Registrar([FromBody] RegistroModel model)
+        {
+            var existingUser = await _userManager.FindByEmailAsync(model.Email);
+            if (existingUser != null)
+            {
+                return BadRequest("Já existe um usuário com este e-mail.");
+            }
+
+            var identityUser = new IdentityUser
+            {
+                UserName = model.Email,
+                Email = model.Email
+            };
+
+            var result = await _userManager.CreateAsync(identityUser, model.Senha);
+
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors);
+            }
+
+            var usuario = new Usuario
+            {
+                UsuarioId = Guid.NewGuid(),
+                Nome = model.Nome,
+                Email = model.Email,
+                UserId = Guid.Parse(identityUser.Id),
+                User = identityUser
+            };
+
+            _context.Usuarios.Add(usuario);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Usuário registrado com sucesso!" });
+        }
+
+        // POST: api/Usuarios/login
+        [AllowAnonymous]
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginModel model)
+        {
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                return Unauthorized("Usuário ou senha inválidos.");
+            }
+
+            var validPassword = await _userManager.CheckPasswordAsync(user, model.Senha);
+            if (!validPassword)
+            {
+                return Unauthorized("Usuário ou senha inválidos.");
+            }
+
+            var claims = new[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(ClaimTypes.Email, user.Email)
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: _configuration["Jwt:Issuer"],
+                audience: _configuration["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.Now.AddHours(1),
+                signingCredentials: creds
+            );
+
+            return Ok(new
+            {
+                token = new JwtSecurityTokenHandler().WriteToken(token)
+            });
+        }
+
         private bool UsuarioExists(Guid id)
         {
             return _context.Usuarios.Any(e => e.UsuarioId == id);
         }
-    }
 
-    public class CompleteRegistrationModel
-    {
-        public string UserId { get; set; }
-        public string Nome { get; set; }
-        public string Telefone { get; set; }
-        public string Cpf { get; set; }
-        public string Genero { get; set; }
-        public string TipoSanguineo { get; set; }
-        public string Endereco { get; set; }
+        public class CompleteRegistrationModel
+        {
+            public string UserId { get; set; }
+            public string Nome { get; set; }
+            public string Telefone { get; set; }
+            public string Cpf { get; set; }
+            public string Genero { get; set; }
+            public string TipoSanguineo { get; set; }
+            public string Endereco { get; set; }
+        }
+
+        public class RegistroModel
+        {
+            public string Nome { get; set; }
+            public string Email { get; set; }
+            public string Senha { get; set; }
+        }
+
+        public class LoginModel
+        {
+            public string Email { get; set; }
+            public string Senha { get; set; }
+        }
     }
 }

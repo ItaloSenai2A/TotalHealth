@@ -21,6 +21,8 @@ namespace TotalHealth.Data
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<MedicoEspecialidade> MedicoEspecialidades { get; set; }
 
+        public DbSet<UsuarioLogin> UsuariosLogin { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
