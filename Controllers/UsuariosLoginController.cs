@@ -49,7 +49,7 @@ namespace TotalHealth.Controllers
 
                 }
             }
-            return BadRequest(new { message = "Usuário associado não encontrado." });
+            return NoContent();
         }
 
         // PUT: api/UsuariosLogin/5
@@ -88,10 +88,29 @@ namespace TotalHealth.Controllers
         [HttpPost]
         public async Task<ActionResult<UsuarioLogin>> PostUsuarioLogin(UsuarioLogin usuarioLogin)
         {
+            //buscar no IdentityUser o usuario.UserId
+            var user = await _context.Users.FindAsync(usuarioLogin.UserId.ToString());
+            if (user == null)
+            {
+                return BadRequest("Usuário não encontrado no Identity");
+            }
+
+            // Verificar se o UserId já está associado a outro UsuarioLogin
+            var existingLogin = await _context.UsuariosLogin
+                .FirstOrDefaultAsync(u => u.UserId == usuarioLogin.UserId);
+
+            if (existingLogin != null)
+            {
+                return BadRequest("Este usuário já possui um login associado.");
+            }
+
+            // Se não existir, adicionar o novo UsuarioLogin
+            usuarioLogin.User = user; // Associar o IdentityUser ao UsuarioLogin
+
             _context.UsuariosLogin.Add(usuarioLogin);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetUsuarioLogin", new { id = usuarioLogin.UsuarioLoginId }, usuarioLogin);
+            return Ok(usuarioLogin);
         }
 
         // DELETE: api/UsuariosLogin/5
