@@ -12,22 +12,21 @@ builder.Services.AddDbContext<TotalHealthDBContext>(options =>
 });
 
 // Add services to the container.
-
 builder.Services.AddControllers();
-
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
 // Configurar o CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", builder =>
+    options.AddPolicy("AllowAll", policy =>
     {
-        builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
     });
 });
 
-// Adionar o Swagger com JWT Bearer
+// Configurar o Swagger com JWT Bearer
 builder.Services.AddSwaggerGen(c =>
 {
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -40,20 +39,19 @@ builder.Services.AddSwaggerGen(c =>
 
     c.AddSecurityRequirement(new OpenApiSecurityRequirement()
     {
-    {
-        new OpenApiSecurityScheme
         {
-        Reference = new OpenApiReference
+            new OpenApiSecurityScheme
             {
-            Type = ReferenceType.SecurityScheme,
-            Id = "Bearer"
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                },
+                Scheme = "oauth2",
+                Name = "Bearer",
+                In = ParameterLocation.Header,
             },
-            Scheme = "oauth2",
-            Name = "Bearer",
-            In = ParameterLocation.Header,
-
-        },
-        new List<string>()
+            new List<string>()
         }
     });
 });
@@ -69,31 +67,30 @@ builder.Services.AddIdentityApiEndpoints<IdentityUser>(options =>
     options.Password.RequireUppercase = false;
     options.Password.RequiredLength = 4;
 })
-    .AddEntityFrameworkStores<TotalHealthDBContext>()
-    .AddDefaultTokenProviders(); // Adiocionando o provedor de tokens padrão
+.AddEntityFrameworkStores<TotalHealthDBContext>()
+.AddDefaultTokenProviders();
 
-// Add Serviço de Autenticação e Autorização
-
+// Serviços de Autenticação e Autorização
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
+
 // Configure the HTTP request pipeline.
 app.UseSwagger();
 app.UseSwaggerUI();
 
-// Mapear os EndPoints padrão do Identy Framework
-app.MapGroup("/Users").MapIdentityApi<IdentityUser>();
-app.MapGroup("/Roles").MapIdentityApi<IdentityRole>();
-
+// ATENÇÃO: UseCors vem ANTES do UseAuthorization
 app.UseHttpsRedirection();
 
-// Permitir a autenticação e autorização de qualquer origem
-app.UseAuthentication();
-app.UseAuthorization();
 app.UseCors("AllowAll");
 
+app.UseAuthentication();
 app.UseAuthorization();
+
+// Mapear os EndPoints padrão do Identity Framework
+app.MapGroup("/Users").MapIdentityApi<IdentityUser>();
+app.MapGroup("/Roles").MapIdentityApi<IdentityRole>();
 
 app.MapControllers();
 

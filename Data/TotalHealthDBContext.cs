@@ -20,7 +20,6 @@ namespace TotalHealth.Data
         public DbSet<Prescricao> Prescricoes { get; set; }
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<MedicoEspecialidade> MedicoEspecialidades { get; set; }
-
         public DbSet<UsuarioLogin> UsuariosLogin { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -37,6 +36,7 @@ namespace TotalHealth.Data
             modelBuilder.Entity<Prescricao>().ToTable("Prescricoes");
             modelBuilder.Entity<Usuario>().ToTable("Usuarios");
             modelBuilder.Entity<MedicoEspecialidade>().ToTable("MedicosEspecialidades");
+            modelBuilder.Entity<UsuarioLogin>().ToTable("UsuariosLogin");
 
             // Configurar comportamento de exclusão para evitar múltiplos caminhos de exclusão em cascata
             modelBuilder.Entity<Agendamento>()
@@ -110,6 +110,12 @@ namespace TotalHealth.Data
                 .WithMany()
                 .HasForeignKey(me => me.EspecialidadeId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<UsuarioLogin>()
+                .HasOne(ul => ul.User)
+                .WithMany()
+                .HasForeignKey(ul => ul.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TotalHealth.Data;
 
@@ -11,9 +12,11 @@ using TotalHealth.Data;
 namespace TotalHealth.Migrations
 {
     [DbContext(typeof(TotalHealthDBContext))]
-    partial class TotalHealthDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250603121115_CorrigeRelacionamentoUsuarioLogin")]
+    partial class CorrigeRelacionamentoUsuarioLogin
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

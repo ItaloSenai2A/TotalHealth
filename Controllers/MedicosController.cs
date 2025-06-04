@@ -95,14 +95,27 @@ namespace TotalHealth.Controllers
 
         // PUT: api/Medicos/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        // PUT: api/Medicos/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutMedico(Guid id, Medico medico)
         {
+            // Verifica se o ID da URL bate com o ID do objeto enviado
             if (id != medico.MedicoId)
             {
-                return BadRequest();
+                return BadRequest("O ID do médico na URL não corresponde ao ID do objeto enviado.");
             }
 
+            // Verificação simples para evitar enviar dados nulos ou inválidos
+            if (string.IsNullOrWhiteSpace(medico.Nome))
+            {
+                return BadRequest("O nome do médico não pode ser vazio.");
+            }
+            if (string.IsNullOrWhiteSpace(medico.Crm))
+            {
+                return BadRequest("O CRM do médico não pode ser vazio.");
+            }
+
+            // Marca o objeto como modificado
             _context.Entry(medico).State = EntityState.Modified;
 
             try
@@ -121,6 +134,7 @@ namespace TotalHealth.Controllers
                 }
             }
 
+            // Retorna 204 NoContent indicando sucesso na atualização
             return NoContent();
         }
 
