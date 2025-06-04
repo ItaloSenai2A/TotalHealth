@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TotalHealth.Data;
 
@@ -11,9 +12,11 @@ using TotalHealth.Data;
 namespace TotalHealth.Migrations
 {
     [DbContext(typeof(TotalHealthDBContext))]
-    partial class TotalHealthDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250527190238_loginRegistro")]
+    partial class loginRegistro
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -447,35 +450,6 @@ namespace TotalHealth.Migrations
                     b.ToTable("Medicos", (string)null);
                 });
 
-            modelBuilder.Entity("TotalHealth.Models.UsuarioLogin", b =>
-                {
-                    b.Property<Guid>("UsuarioLoginId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Cargo")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Telefone")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("UsuarioLoginId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UsuariosLogin", (string)null);
-                });
-
             modelBuilder.Entity("Usuario", b =>
                 {
                     b.Property<Guid>("UsuarioId")
@@ -688,17 +662,6 @@ namespace TotalHealth.Migrations
                     b.Navigation("Medico");
 
                     b.Navigation("Usuario");
-                });
-
-            modelBuilder.Entity("TotalHealth.Models.UsuarioLogin", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Usuario", b =>
