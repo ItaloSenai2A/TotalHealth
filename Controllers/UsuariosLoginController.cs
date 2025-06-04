@@ -50,7 +50,12 @@ namespace TotalHealth.Controllers
 
                 if (usuario != null)
                 {
-                    return Ok(usuario);
+                    return Ok(new
+                    {
+                        email = user.Email,
+                        userId = user.Id
+                    }
+                        );
                 }
             }
 
