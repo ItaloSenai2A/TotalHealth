@@ -32,7 +32,6 @@ namespace TotalHealth.Controllers
             _configuration = configuration;
         }
 
-        // GET: api/Usuarios
         [HttpGet]
         [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<Usuario>>> GetUsuarios()
@@ -40,7 +39,6 @@ namespace TotalHealth.Controllers
             return await _context.Usuarios.ToListAsync();
         }
 
-        // GET: api/Usuarios/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Usuario>> GetUsuario(Guid id)
         {
@@ -54,19 +52,58 @@ namespace TotalHealth.Controllers
             return usuario;
         }
 
-        // PUT: api/Usuarios/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUsuario(Guid id, Usuario usuario)
         {
             if (id != usuario.UsuarioId)
             {
-                return BadRequest();
+                return BadRequest("O ID do usuário não confere com o corpo da requisição.");
             }
 
-            _context.Entry(usuario).State = EntityState.Modified;
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null || usuario.UserId.ToString() != userId)
+            {
+                return Unauthorized("Você só pode atualizar seu próprio perfil.");
+            }
+
+            var usuarioExistente = await _context.Usuarios.Include(u => u.User).FirstOrDefaultAsync(u => u.UsuarioId == id);
+            if (usuarioExistente == null)
+            {
+                return NotFound("Usuário não encontrado.");
+            }
+
+            // Atualiza os dados da tabela Usuarios
+            usuarioExistente.Nome = usuario.Nome;
+            usuarioExistente.Telefone = usuario.Telefone;
+            usuarioExistente.Cpf = usuario.Cpf;
+            usuarioExistente.Genero = usuario.Genero;
+            usuarioExistente.TipoSanguineo = usuario.TipoSanguineo;
+            usuarioExistente.Endereco = usuario.Endereco;
+
+            // Atualiza o IdentityUser (email)
+            var identityUser = await _userManager.FindByIdAsync(userId);
+            if (identityUser != null)
+            {
+                if (identityUser.Email != usuario.Email)
+                {
+                    identityUser.Email = usuario.Email;
+                    identityUser.UserName = usuario.Email;
+                    identityUser.NormalizedEmail = usuario.Email.ToUpper();
+                    identityUser.NormalizedUserName = usuario.Email.ToUpper();
+
+                    var result = await _userManager.UpdateAsync(identityUser);
+                    if (!result.Succeeded)
+                    {
+                        return BadRequest("Erro ao atualizar o e-mail do Identity.");
+                    }
+                }
+
+                usuarioExistente.Email = identityUser.Email;
+            }
 
             try
             {
+                _context.Usuarios.Update(usuarioExistente);
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
@@ -81,10 +118,9 @@ namespace TotalHealth.Controllers
                 }
             }
 
-            return NoContent();
+            return Ok(usuarioExistente);
         }
 
-        // POST: api/Usuarios
         [HttpPost]
         public async Task<ActionResult<Usuario>> PostUsuario(Usuario usuario)
         {
@@ -111,7 +147,6 @@ namespace TotalHealth.Controllers
             return CreatedAtAction("GetUsuario", new { id = usuario.UsuarioId }, usuario);
         }
 
-        // DELETE: api/Usuarios/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUsuario(Guid id)
         {
@@ -127,14 +162,18 @@ namespace TotalHealth.Controllers
             return NoContent();
         }
 
-        // POST: api/Usuarios/CompleteRegistration
         [HttpPost("CompleteRegistration")]
         public async Task<IActionResult> CompleteRegistration([FromBody] CompleteRegistrationModel model)
         {
+            if (!Guid.TryParse(model.UserId, out Guid userGuid))
+            {
+                return BadRequest("Formato de UserId inválido.");
+            }
+
             var user = await _userManager.FindByIdAsync(model.UserId);
             if (user == null)
             {
-                return NotFound("User not found");
+                return NotFound("Usuário não encontrado.");
             }
 
             var usuario = new Usuario
@@ -147,7 +186,7 @@ namespace TotalHealth.Controllers
                 Genero = model.Genero,
                 TipoSanguineo = model.TipoSanguineo,
                 Endereco = model.Endereco,
-                UserId = Guid.Parse(user.Id),
+                UserId = userGuid,
                 User = user
             };
 
@@ -157,7 +196,6 @@ namespace TotalHealth.Controllers
             return Ok(usuario);
         }
 
-        // POST: api/Usuarios/registrar
         [AllowAnonymous]
         [HttpPost("registrar")]
         public async Task<IActionResult> Registrar([FromBody] RegistroModel model)
@@ -186,6 +224,11 @@ namespace TotalHealth.Controllers
                 UsuarioId = Guid.NewGuid(),
                 Nome = model.Nome,
                 Email = model.Email,
+                Cpf = model.Cpf,
+                Genero = model.Genero,
+                Endereco = model.Endereco,
+                Telefone = model.Telefone,
+                TipoSanguineo = model.TipoSanguineo,
                 UserId = Guid.Parse(identityUser.Id),
                 User = identityUser
             };
@@ -196,7 +239,6 @@ namespace TotalHealth.Controllers
             return Ok(new { message = "Usuário registrado com sucesso!" });
         }
 
-        // POST: api/Usuarios/login
         [AllowAnonymous]
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel model)
@@ -257,6 +299,11 @@ namespace TotalHealth.Controllers
             public string Nome { get; set; }
             public string Email { get; set; }
             public string Senha { get; set; }
+            public string Cpf { get; set; }
+            public string Genero { get; set; }
+            public string Endereco { get; set; }
+            public string Telefone { get; set; }
+            public string TipoSanguineo { get; set; }
         }
 
         public class LoginModel
