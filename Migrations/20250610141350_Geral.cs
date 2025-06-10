@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace TotalHealth.Migrations
 {
     /// <inheritdoc />
-    public partial class Banco : Migration
+    public partial class Geral : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -220,6 +220,27 @@ namespace TotalHealth.Migrations
                         column: x => x.UserId1,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UsuariosLogin",
+                columns: table => new
+                {
+                    UsuarioLoginId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Cargo = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Username = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Telefone = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UsuariosLogin", x => x.UsuarioLoginId);
+                    table.ForeignKey(
+                        name: "FK_UsuariosLogin_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -487,6 +508,11 @@ namespace TotalHealth.Migrations
                 name: "IX_Usuarios_UserId1",
                 table: "Usuarios",
                 column: "UserId1");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UsuariosLogin_UserId",
+                table: "UsuariosLogin",
+                column: "UserId");
         }
 
         /// <inheritdoc />
@@ -518,6 +544,9 @@ namespace TotalHealth.Migrations
 
             migrationBuilder.DropTable(
                 name: "Pagamentos");
+
+            migrationBuilder.DropTable(
+                name: "UsuariosLogin");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
