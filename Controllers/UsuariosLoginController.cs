@@ -53,7 +53,8 @@ namespace TotalHealth.Controllers
                     return Ok(new
                     {
                         email = user.Email,
-                        userId = user.Id
+                        userId = user.Id,
+                        nome = usuario.Username
                     }
                         );
                 }
